@@ -16,12 +16,10 @@ public:
 		/// Ensure we only operate on Natural numbers.
 		//auto L0 = L <= 1 ? 0 : L - 1;
 		//auto E0 = E <= 1 ? 0 : E - 1;
-		//auto E1 = E < 0 ? 0 : E;
-		//auto F1 = F < 0 ? 0 : F;
-		///		Level offset				   Element offset	   Face offset.
-		//return (L0 * ((Ac * Fc) + Ac + 1))  +  ((E0 * Fc) + E)  +  F1;
+		///	 Level offset			 Element offset	     Face offset
+		//return (L0 * ((Ac * Fc) + Ac + 1))  +  ((E0 * Fc) + E)  +  F;
 
-		return ((L <= 1 ? 0 : L - 1) * ((Ec * Fc) + Ec + 1)) + (((E <= 1 ? 0 : E - 1) * Fc) + (E < 0 ? 0 : E)) + (F < 0 ? 0 : F);
+		return ((L <= 1 ? 0 : L - 1) * ((Ec * Fc) + Ec + 1)) + ((E <= 1 ? 0 : E - 1) * Fc) + E + F;
 	};
 };
 
