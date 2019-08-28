@@ -13,7 +13,7 @@ public:
 	// @param - allowed range is [1-N], where 1 is the first element of the subregion.
 	inline uint32_t GetOffset(const uint32_t& L = 1, const uint32_t& E = 0, const uint32_t& F = 0)
 	{
-		/// Ensure we only operate on Natural numbers.
+		/// Ensure we only operate on whole numbers.
 		//auto L0 = L <= 1 ? 0 : L - 1;
 		//auto E0 = E <= 1 ? 0 : E - 1;
 		///	 Level offset			 Element offset	     Face offset
