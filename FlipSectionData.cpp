@@ -1,31 +1,29 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <algorithm>
 
 void ControlFlippedSectionData(const void* pData1, const void* pData2, const uint16_t& rSectionCount, const uint8_t& rSectionByteLength)
 {
-
-	std::cout << "Original data:" << "   " << "Flipped data:" << std::endl;
+	std::cout << "Original:";
+	for (uint8_t i = 0; i < (rSectionByteLength -3); i++)
+		std::cout << ' ';
+	std::cout << "Flipped:" << std::endl;
 
 	///------------------------------------------------------------------------------------------    Control the flipped and non flipped data    ----
 	uint8_t* tempBlock = new uint8_t[rSectionByteLength];
 	for (uint16_t row = 0; row < (rSectionCount); row++)
 	{
-		/// Get a pointer to the first row, each iteration go towards the middle.
-		std::string pRow0 = (char*)(pData1)+(row * rSectionByteLength);
-
-		/// Get a pointer to the last row, each iteration go towards the middle.
-		std::string pRow1 = (char*)(pData2)+((rSectionCount - row - 1) * rSectionByteLength);
-
 		/// Create temporary strings. compare method can return val>0 | val<0 if comparing strings are not the same size.
-		std::string r0 = pRow0.substr(0, rSectionByteLength);
-		std::string r1 = pRow1.substr(0, rSectionByteLength);
+		std::string orgDataFirstRows     = std::string{ (char*)(pData1) + (row * rSectionByteLength), rSectionByteLength };
+		std::string flippedDataLastRows  = std::string{ (char*)(pData2) + ((rSectionCount - row - 1) * rSectionByteLength), rSectionByteLength };
+		std::string flippedDataFirstRows = std::string{ (char*)(pData2) + (row * rSectionByteLength), rSectionByteLength };
 
-		if (r0.compare(0, rSectionByteLength, r1) != 0) {
-			std::cout << r0 << "      " << r1 << "\t Data not flipped correctly" << std::endl;
-		}else{
-			std::cout << r0 << "      " << r1 << std::endl;
+		/// Compare if strings are the same.
+		if (orgDataFirstRows.compare(0, rSectionByteLength, flippedDataLastRows) != 0) {
+			std::cout << orgDataFirstRows << "      " << flippedDataFirstRows << "\t Data not flipped correctly" << std::endl;
+		}
+		else {
+			std::cout << orgDataFirstRows << "      " << flippedDataFirstRows << std::endl;
 		}
 	}
 }
@@ -38,7 +36,9 @@ bool FlipSectionData(void** ppData, const uint16_t& rSectionCount, const uint16_
 {
 	/// Temp memory block large enough to hold one section of data.
 	void* tempBlock = calloc(rSectionSize, sizeof(uint8_t));
-		/// Loop over each section until you are at the mid point of amount of sections ([rSectionCount] >> 1).
+	if (tempBlock == nullptr) return false;
+
+	/// Loop over each section until you are at the mid point of amount of sections ([rSectionCount] >> 1).
 	for (uint16_t row = 0; row < (rSectionCount >> 1); row++)
 	{
 		/// Get a pointer to the first row, each iteration go towards the middle.
@@ -50,7 +50,8 @@ bool FlipSectionData(void** ppData, const uint16_t& rSectionCount, const uint16_
 		memcpy(pRow0, pRow1, rSectionSize);
 		memcpy(pRow1, tempBlock, rSectionSize);
 	}
-	delete tempBlock;
+
+	free(tempBlock);
 
 	return true;
 }
@@ -73,11 +74,15 @@ int main()
 	for (unsigned int entry = 0; entry < totalEntries; entry++)
 	{
 		*((char*)pMemBlock + (sizeof(char) * entry)) = k++;
+		if (k == 'z') k = '1';
 	}
+
 	/// Copying data to separate memory block to compare (flipped) result against.
 	memcpy(pMemBlock2, pMemBlock, totalEntries);
+
 	/// Calculating bytes per section based on previous input.
 	uint8_t bytesPerSection = bytesPerEntry * rWidth;
+
 	/// Flip data.
 	FlipSectionData(&pMemBlock, rHeight, bytesPerSection);
 
@@ -85,9 +90,12 @@ int main()
 	/// The error will be picked up in the control function.
 		//*(char*)pMemBlock = '2';
 		//*((char*)pMemBlock2 + (rWidth * (rHeight-1))) = '[';
-	
+
 	/// Tests are conducted for each section inside function.
-	ControlFlippedSectionData(pMemBlock, pMemBlock2, rHeight, bytesPerSection);
+	ControlFlippedSectionData(pMemBlock2, pMemBlock, rHeight, bytesPerSection);
+
+	free(pMemBlock);
+	free(pMemBlock2);
 
 	return 0;
 }
