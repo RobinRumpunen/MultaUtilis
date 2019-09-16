@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <string>
 
 void ControlFlippedSectionData(const void* pData1, const void* pData2, const uint16_t& rSectionCount, const uint8_t& rSectionByteLength)
