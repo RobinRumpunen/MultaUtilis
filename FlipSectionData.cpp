@@ -57,7 +57,7 @@ bool FlipSectionData(void** ppData, const uint16_t& rSectionCount, const uint16_
 
 int main()
 {
-	size_t bytesPerEntry = 2;
+	const size_t bytesPerEntry = 2;
 	const uint8_t rWidth = 5;
 	const uint8_t rHeight = 5;
 	const uint8_t totalEntries = rWidth * rHeight * bytesPerEntry;
